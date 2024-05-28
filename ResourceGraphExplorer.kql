@@ -1,0 +1,31 @@
+resources
+| where type=~ 'Microsoft.HybridCompute/machines'
+
+resources
+| where type=~ 'Microsoft.HybridCompute/machines'
+| extend cloudProvider = tostring(properties.detectedProperties.cloudprovider)
+| where cloudProvider in ("AWS" , "GCP")
+| summarize serversCount = count() by cloudProvider
+
+resources
+| where type=~ 'Microsoft.HybridCompute/machines' and isnotempty(tags['Environment'])
+| extend Environment = tags["Environment"]
+| project name, tags
+
+Resources
+| where type == 'microsoft.hybridcompute/machines'
+| project id, JoinID = toupper(id), ComputerName = tostring(properties.osProfile.computerName), OSName = tostring(properties.osName)
+| join kind=leftouter(
+    Resources
+    | where type == 'microsoft.hybridcompute/machines/extensions'
+    | project MachineId = toupper(substring(id, 0, indexof(id, '/extensions'))), ExtensionName = name
+) on $left.JoinID == $right.MachineId
+| summarize Extensions = make_list(ExtensionName) by id, ComputerName, OSName
+| order by tolower(OSName) desc
+
+
+Resources
+| where type =~ 'Microsoft.HybridCompute/machines'
+| extend arcAgentVersion = tostring(properties.['agentVersion']), osName = tostring(properties.['osName']), osVersion = tostring(properties.['osVersion']), osSku = tostring(properties.['osSku']),
+lastStatusChange = tostring(properties.['lastStatusChange'])
+| project name, arcAgentVersion, osName, osVersion, osSku, lastStatusChange
