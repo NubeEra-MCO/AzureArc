@@ -1,36 +1,30 @@
 #!/bin/bash
 
-# Update package list
-echo "Updating package list..."
-sudo apt-get update
+# Update the package lists
+sudo dnf update -y
 
-# Install MySQL server
-echo "Installing MySQL server..."
-sudo apt-get install -y mysql-server
+# Install MySQL
+sudo dnf install -y mysql-server
 
-# Secure MySQL installation (optional, interactive)
-# Uncomment the following line if you want to run the secure installation interactively
-# sudo mysql_secure_installation
+# Start MySQL service
+sudo systemctl start mysqld
+
+# Enable MySQL service to start on boot
+sudo systemctl enable mysqld
+
+# Secure MySQL installation (optional)
+# You might want to interactively run `mysql_secure_installation` after this script
 
 # Install Nginx
-echo "Installing Nginx..."
-sudo apt-get install -y nginx
+sudo dnf install -y nginx
 
-# Start and enable MySQL service
-echo "Starting and enabling MySQL service..."
-sudo systemctl start mysql
-sudo systemctl enable mysql
-
-# Start and enable Nginx service
-echo "Starting and enabling Nginx service..."
+# Start Nginx service
 sudo systemctl start nginx
+
+# Enable Nginx service to start on boot
 sudo systemctl enable nginx
 
-# Print status of MySQL and Nginx
-echo "MySQL service status:"
-sudo systemctl status mysql | grep "Active:"
-
-echo "Nginx service status:"
-sudo systemctl status nginx | grep "Active:"
-
-echo "Installation completed successfully!"
+# Print status of MySQL and Nginx services
+echo "MySQL and Nginx have been installed and started. Their statuses are as follows:"
+sudo systemctl status mysqld
+sudo systemctl status nginx
